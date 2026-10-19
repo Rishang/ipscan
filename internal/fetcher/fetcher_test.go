@@ -168,6 +168,9 @@ func TestPortTextFetchers(t *testing.T) {
 		}
 	})
 	cfg := config.Default()
+	// No port scan: httpproxy also probes open ports, and CI hosts (e.g.
+	// Windows runners) may have a real web server on 127.0.0.1:80.
+	cfg.Scanner.Ports = ""
 	cfg.Fetcher.WebDetect.Port = int(port)
 	cfg.Fetcher.HTTPSender.Port = int(port)
 	cfg.Fetcher.HTTPProxy.Port = int(port)
