@@ -1,0 +1,124 @@
+version: "3"
+
+vars:
+  BINARY: ipscan
+  PKG: ./cmd/ipscan
+  VERSION:
+    sh: git describe --tags --always --dirty 2>/dev/null || echo dev
+  LDFLAGS: -s -w -X main.version={{.VERSION}}
+  STATICCHECK_VERSION: 2025.1.1
+
+env:
+  CGO_ENABLED: "0"
+
+tasks:
+  default:
+    desc: Check formatting, vet, test and build (same as `task all`)
+    cmds:
+      - task: all
+
+  all:
+    desc: fmt-check, vet, test, build
+    cmds:
+      - task: fmt-check
+      - task: vet
+      - task: test
+      - task: build
+
+  build:
+    desc: Build bin/ipscan for the current platform
+    cmds:
+      - go build -trimpath -ldflags '{{.LDFLAGS}}' -o bin/{{.BINARY}}{{exeExt}} {{.PKG}}
+    sources:
+      - "**/*.go"
+      - go.mod
+      - go.sum
+      - internal/mac/mac-vendors.txt
+    generates:
+      - bin/{{.BINARY}}{{exeExt}}
+
+  run:
+    desc: "Run the scanner, e.g. task run -- 127.0.0.1-5"
+    cmds:
+      - go run -ldflags '{{.LDFLAGS}}' {{.PKG}} {{.CLI_ARGS}}
+
+  test:
+    desc: Run all tests with the race detector
+    env:
+      CGO_ENABLED: "1"
+    cmds:
+      - go test -race ./...
+
+  test-short:
+    desc: Run tests without network tests
+    cmds:
+      - go test -short ./...
+
+  vet:
+    desc: go vet for every release target
+    cmds:
+      - for:
+          matrix:
+            OS: [linux, darwin, windows]
+            ARCH: [amd64, arm64]
+        cmd: go vet ./...
+        env:
+          GOOS: "{{.ITEM.OS}}"
+          GOARCH: "{{.ITEM.ARCH}}"
+
+  fmt:
+    desc: Format all Go files
+    cmds:
+      - gofmt -w .
+
+  fmt-check:
+    desc: Fail if any file needs gofmt
+    cmds:
+      - |
+        out=$(gofmt -l .)
+        if [ -n "$out" ]; then echo "gofmt needed:"; echo "$out"; exit 1; fi
+    silent: true
+
+  lint:
+    desc: Run staticcheck
+    cmds:
+      - go run honnef.co/go/tools/cmd/staticcheck@{{.STATICCHECK_VERSION}} ./...
+
+  cross:
+    desc: Build plain binaries for all 6 targets into dist/
+    cmds:
+      - for:
+          matrix:
+            OS: [linux, darwin, windows]
+            ARCH: [amd64, arm64]
+        cmd: |
+          ext=""; [ "{{.ITEM.OS}}" = windows ] && ext=".exe"
+          GOOS={{.ITEM.OS}} GOARCH={{.ITEM.ARCH}} go build -trimpath -ldflags '{{.LDFLAGS}}' \
+            -o dist/{{.BINARY}}-{{.VERSION}}-{{.ITEM.OS}}-{{.ITEM.ARCH}}$ext {{.PKG}}
+
+  dist:
+    desc: Build release archives (tar.gz, zip for windows) and SHA256SUMS into dist/
+    cmds:
+      - task: clean
+      - for:
+          matrix:
+            OS: [linux, darwin, windows]
+            ARCH: [amd64, arm64]
+        cmd: |
+          set -e
+          os={{.ITEM.OS}}; arch={{.ITEM.ARCH}}
+          name={{.BINARY}}-{{.VERSION}}-$os-$arch
+          bin={{.BINARY}}; [ "$os" = windows ] && bin={{.BINARY}}.exe
+          echo "building $os/$arch"
+          GOOS=$os GOARCH=$arch go build -trimpath -ldflags '{{.LDFLAGS}}' -o dist/$name/$bin {{.PKG}}
+          cp LICENSE README.md dist/$name/
+          if [ "$os" = windows ]; then (cd dist && zip -qr $name.zip $name)
+          else tar -C dist -czf dist/$name.tar.gz $name; fi
+          rm -rf dist/$name
+      - cd dist && sha256sum *.tar.gz *.zip > SHA256SUMS
+      - ls -l dist
+
+  clean:
+    desc: Remove build output
+    cmds:
+      - rm -rf bin dist
