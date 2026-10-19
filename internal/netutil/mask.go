@@ -66,25 +66,6 @@ func PrefixMask(bits, size int) Mask {
 	return m
 }
 
-// PrefixLen returns the prefix length if the mask is contiguous.
-func (m Mask) PrefixLen() (int, bool) {
-	bits, ended := 0, false
-	for _, b := range m {
-		for i := 7; i >= 0; i-- {
-			set := b&(1<<i) != 0
-			if set && ended {
-				return 0, false
-			}
-			if set {
-				bits++
-			} else {
-				ended = true
-			}
-		}
-	}
-	return bits, true
-}
-
 // String renders the mask as an address.
 func (m Mask) String() string {
 	if a, ok := netip.AddrFromSlice(m); ok {

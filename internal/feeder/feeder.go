@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+// Package feeder produces scan targets from ranges, random addresses, files and target expressions.
 package feeder
 
 import (
@@ -151,7 +152,7 @@ func (r *Random) Info() string {
 
 // ---------------------------------------------------------------- List
 
-// List feeds a fixed list of subjects (file contents, rescans, single hosts).
+// List feeds a fixed list of subjects (file contents, single hosts).
 type List struct {
 	name, info string
 	items      []Subject
@@ -161,18 +162,6 @@ type List struct {
 // NewList creates a list feeder.
 func NewList(name, info string, items []Subject) *List {
 	return &List{name: name, info: info, items: items}
-}
-
-// NewRescan creates a feeder that rescans the given addresses.
-func NewRescan(addrs []netip.Addr) (*List, error) {
-	if len(addrs) == 0 {
-		return nil, errors.New("nothing to rescan")
-	}
-	items := make([]Subject, len(addrs))
-	for i, a := range addrs {
-		items[i] = Subject{Addr: a}
-	}
-	return NewList("rescan", fmt.Sprint(len(addrs)), items), nil
 }
 
 func (l *List) Next() (Subject, bool) {

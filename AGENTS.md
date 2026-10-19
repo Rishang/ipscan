@@ -28,7 +28,7 @@ Always run `task vet` after touching OS-specific files. It vets all six release 
 | `cmd/ipscan/` | CLI (cobra): `scan.go` is the main flow, `cmds.go` the subcommands, `legacy.go` rewrites old `-f:range ...` arguments |
 | `internal/model` | `Value`, `Result`, `ResultType`, `Stats`, sorting, port lists |
 | `internal/netutil` | netmask parsing, range math, broadcast detection, interface snapshot |
-| `internal/feeder` | target sources: range, random, file, rescan, target-expression parser |
+| `internal/feeder` | target sources: range, random, file, target-expression parser |
 | `internal/pinger` | ICMP (unix and Windows API), TCP, UDP, combined, ARP wrapper |
 | `internal/mac` | neighbour-table lookup per OS, embedded OUI vendor list |
 | `internal/resolve` | mDNS and NetBIOS queries |

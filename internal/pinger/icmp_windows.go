@@ -36,8 +36,6 @@ func newICMP(timeout time.Duration) (Pinger, error) {
 	return &winICMP{timeout: timeout}, nil
 }
 
-func (p *winICMP) Name() string { return ICMP }
-
 func (p *winICMP) Ping(ctx context.Context, addr netip.Addr, count int, _ []uint16) (*Result, error) {
 	addr = addr.Unmap()
 	create := procIcmpCreateFile

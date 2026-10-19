@@ -21,7 +21,6 @@ import (
 
 type fakePinger struct{ alive bool }
 
-func (p *fakePinger) Name() string { return "fake" }
 func (p *fakePinger) Ping(_ context.Context, _ netip.Addr, count int, _ []uint16) (*pinger.Result, error) {
 	r := &pinger.Result{Sent: count}
 	if p.alive {

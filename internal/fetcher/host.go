@@ -64,7 +64,6 @@ type Host struct {
 	Iface     netutil.IfaceAddr
 	Local     bool // on a directly attached network
 	Type      model.ResultType
-	Aborted   bool
 
 	ping                 *pinger.Result
 	pinged               bool
@@ -80,9 +79,6 @@ func NewHost(env *Env, s feeder.Subject) *Host {
 	h.Iface, h.Local = netutil.FindLocal(env.Ifaces, h.Addr)
 	return h
 }
-
-// Env returns the scan environment.
-func (h *Host) Env() *Env { return h.env }
 
 func (h *Host) setType(t model.ResultType) {
 	if t > h.Type {

@@ -294,9 +294,6 @@ func runScan(cmd *cobra.Command, o *scanOpts, args []string) error {
 	}
 
 	ctx := cmd.Context()
-	if ctx == nil {
-		ctx = context.Background()
-	}
 	resolveCtx, cancelResolve := context.WithTimeout(ctx, 30*time.Second)
 	fd, err := o.buildFeeder(resolveCtx, args)
 	cancelResolve()

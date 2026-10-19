@@ -46,15 +46,6 @@ func ParsePorts(spec string) (PortList, error) {
 	return list, nil
 }
 
-// MustParsePorts is like ParsePorts but panics on error; intended for constants.
-func MustParsePorts(spec string) PortList {
-	l, err := ParsePorts(spec)
-	if err != nil {
-		panic(err)
-	}
-	return l
-}
-
 func parsePort(s string) (uint16, error) {
 	n, err := strconv.Atoi(s)
 	if err != nil || n < 1 || n > 65535 {
@@ -83,17 +74,4 @@ func (l PortList) All() iter.Seq[uint16] {
 			}
 		}
 	}
-}
-
-// String renders the list back into specification form.
-func (l PortList) String() string {
-	parts := make([]string, len(l))
-	for i, r := range l {
-		if r.Start == r.End {
-			parts[i] = strconv.Itoa(int(r.Start))
-		} else {
-			parts[i] = fmt.Sprintf("%d-%d", r.Start, r.End)
-		}
-	}
-	return strings.Join(parts, ",")
 }

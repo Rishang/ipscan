@@ -20,8 +20,6 @@ const minAdaptedTimeout = 100 * time.Millisecond
 
 type tcpPinger struct{ timeout time.Duration }
 
-func (p *tcpPinger) Name() string { return TCP }
-
 func (p *tcpPinger) Ping(ctx context.Context, addr netip.Addr, count int, ports []uint16) (*Result, error) {
 	res := &Result{}
 	var working uint16
@@ -73,8 +71,6 @@ func closeRST(c net.Conn) {
 const udpProbePort = 33435
 
 type udpPinger struct{ timeout time.Duration }
-
-func (p *udpPinger) Name() string { return UDP }
 
 func (p *udpPinger) Ping(ctx context.Context, addr netip.Addr, count int, _ []uint16) (*Result, error) {
 	var d net.Dialer

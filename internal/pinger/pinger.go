@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+// Package pinger implements ICMP, TCP, UDP, combined and ARP host liveness probes.
 package pinger
 
 import (
@@ -18,7 +19,6 @@ import (
 // Pinger checks whether a host is alive. Implementations are safe for
 // concurrent use and return promptly when ctx is cancelled.
 type Pinger interface {
-	Name() string
 	// Ping sends count probes to addr. ports are ports requested for this
 	// host, which some pingers may probe first. A returned error means the
 	// probe could not be performed at all (not that the host is dead).
@@ -122,8 +122,6 @@ func newCombined(timeout time.Duration) *combinedPinger {
 	return &combinedPinger{udp: &udpPinger{timeout: timeout}, tcp: &tcpPinger{timeout: timeout}}
 }
 
-func (p *combinedPinger) Name() string { return Combined }
-
 func (p *combinedPinger) Ping(ctx context.Context, addr netip.Addr, count int, ports []uint16) (*Result, error) {
 	n1 := max(1, count/2)
 	r, err := p.udp.Ping(ctx, addr, n1, ports)
@@ -157,8 +155,6 @@ type arpPinger struct {
 func WithARP(trigger Pinger, lookup MACLookup) Pinger {
 	return &arpPinger{trigger: trigger, lookup: lookup}
 }
-
-func (p *arpPinger) Name() string { return p.trigger.Name() + "+arp" }
 
 func (p *arpPinger) Ping(ctx context.Context, addr netip.Addr, count int, ports []uint16) (*Result, error) {
 	n := max(1, count-count/2)

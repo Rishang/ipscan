@@ -13,7 +13,7 @@ import (
 
 func TestResultStats(t *testing.T) {
 	r := &Result{Sent: 3}
-	if r.Alive() || r.Avg() != 0 || r.LossPercent() != 100 || r.TimeoutAdaptable() {
+	if r.Alive() || r.Avg() != 0 || r.TimeoutAdaptable() {
 		t.Errorf("empty result: %+v", r)
 	}
 	r.addReply(10 * time.Millisecond)
@@ -21,8 +21,8 @@ func TestResultStats(t *testing.T) {
 	if !r.Alive() || r.Avg() != 20*time.Millisecond || r.Min != 10*time.Millisecond || r.Max != 30*time.Millisecond {
 		t.Errorf("stats: %+v avg=%v", r, r.Avg())
 	}
-	if r.Lost() != 1 || r.LossPercent() != 33 || r.TimeoutAdaptable() {
-		t.Errorf("loss: %d %d", r.Lost(), r.LossPercent())
+	if r.Lost() != 1 || r.TimeoutAdaptable() {
+		t.Errorf("loss: %d", r.Lost())
 	}
 	r.Sent++
 	r.addReply(20 * time.Millisecond)
@@ -180,7 +180,6 @@ func TestARPWrapper(t *testing.T) {
 
 type stubPinger struct{ alive bool }
 
-func (s *stubPinger) Name() string { return "stub" }
 func (s *stubPinger) Ping(_ context.Context, _ netip.Addr, count int, _ []uint16) (*Result, error) {
 	r := &Result{Sent: count}
 	if s.alive {

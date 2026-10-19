@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+// Package output renders streaming result tables, progress and statistics to the terminal.
 package output
 
 import (
@@ -61,7 +62,6 @@ type Table struct {
 	labels model.Labels
 	color  bool
 	mu     *sync.Mutex // shared with Progress so lines never interleave
-	header bool
 }
 
 // NewTable creates a table writer. Column widths follow the TXT export
@@ -101,7 +101,6 @@ func (t *Table) Header() error {
 		t.cell(&sb, i, n, ansiBold)
 	}
 	sb.WriteByte('\n')
-	t.header = true
 	t.w.WriteString(sb.String())
 	return t.w.Flush()
 }

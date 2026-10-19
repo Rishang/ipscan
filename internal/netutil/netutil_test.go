@@ -44,19 +44,6 @@ func TestParseMask(t *testing.T) {
 	}
 }
 
-func TestPrefixLen(t *testing.T) {
-	for in, want := range map[string]int{"/24": 24, "255.255.255.192": 26, "/0": 0, "/64": 64} {
-		m, _ := ParseMask(in)
-		if n, ok := m.PrefixLen(); !ok || n != want {
-			t.Errorf("%s PrefixLen = %d,%v", in, n, ok)
-		}
-	}
-	m, _ := ParseMask("255.0.0.255")
-	if _, ok := m.PrefixLen(); ok {
-		t.Error("non-contiguous mask reported as contiguous")
-	}
-}
-
 func TestRangeByMask(t *testing.T) {
 	tests := []struct{ addr, mask, start, end string }{
 		{"127.0.1.92", "255.255.255.192", "127.0.1.64", "127.0.1.127"},

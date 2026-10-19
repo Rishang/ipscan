@@ -36,14 +36,6 @@ func (r *Result) Avg() time.Duration {
 // Lost is the number of probes without a reply.
 func (r *Result) Lost() int { return r.Sent - r.Recv }
 
-// LossPercent is the packet loss in percent; 100 if nothing was received.
-func (r *Result) LossPercent() int {
-	if r.Recv == 0 || r.Sent == 0 {
-		return 100
-	}
-	return r.Lost() * 100 / r.Sent
-}
-
 // TimeoutAdaptable reports whether the RTT statistics are trustworthy enough
 // to shorten subsequent port timeouts.
 func (r *Result) TimeoutAdaptable() bool {

@@ -192,19 +192,6 @@ func TestFromReader(t *testing.T) {
 	}
 }
 
-func TestRescan(t *testing.T) {
-	l, err := NewRescan([]netip.Addr{netip.MustParseAddr("1.2.3.4"), netip.MustParseAddr("::1")})
-	if err != nil {
-		t.Fatal(err)
-	}
-	if got := drain(t, l); !slices.Equal(got, []string{"1.2.3.4", "::1"}) {
-		t.Errorf("rescan = %v", got)
-	}
-	if _, err := NewRescan(nil); err == nil {
-		t.Error("empty rescan must fail")
-	}
-}
-
 func TestParseTargets(t *testing.T) {
 	res := fakeResolver(map[string]string{"router.lan": "192.168.1.1", "v6.lan": "2001:db8::5"})
 	tests := []struct {

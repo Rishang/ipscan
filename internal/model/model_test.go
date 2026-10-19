@@ -171,22 +171,6 @@ func TestSortResultsBothDirections(t *testing.T) {
 	}
 }
 
-func TestResultTypeMatches(t *testing.T) {
-	tests := []struct {
-		t, other ResultType
-		want     bool
-	}{
-		{Alive, Alive, true}, {Alive, WithPorts, true}, {Alive, Dead, false}, {Alive, Unknown, false},
-		{WithPorts, WithPorts, true}, {WithPorts, Alive, false},
-		{Dead, Dead, true}, {Dead, Unknown, true}, {Dead, Alive, false},
-	}
-	for _, tt := range tests {
-		if got := tt.t.Matches(tt.other); got != tt.want {
-			t.Errorf("%v.Matches(%v) = %v", tt.t, tt.other, got)
-		}
-	}
-}
-
 func TestNewResult(t *testing.T) {
 	r := NewResult(localhost, 3)
 	if r.Values[0].Kind != KindIP || r.Values[1].Kind != KindNotScanned || r.Type != Unknown {
@@ -210,22 +194,6 @@ func TestStats(t *testing.T) {
 	s.Finish(true)
 	if snap = s.Snapshot(); !snap.Finished || !snap.Aborted || snap.CompletedNormally() {
 		t.Errorf("unexpected finished snapshot %+v", snap)
-	}
-}
-
-func TestFindText(t *testing.T) {
-	rs := []*Result{res(Text("alpha")), res(NotAvailable), res(Text("Beta")), res(Text("alphabet"))}
-	tests := []struct {
-		text  string
-		start int
-		want  int
-	}{
-		{"alpha", 0, 0}, {"alpha", 1, 3}, {"BETA", 0, 2}, {"[n/a]", 0, 1}, {"zzz", 0, -1}, {"alpha", 4, -1},
-	}
-	for _, tt := range tests {
-		if got := FindText(rs, tt.text, tt.start); got != tt.want {
-			t.Errorf("FindText(%q,%d) = %d, want %d", tt.text, tt.start, got, tt.want)
-		}
 	}
 }
 
@@ -258,11 +226,8 @@ func TestParsePorts(t *testing.T) {
 			t.Errorf("ParsePorts(%q).Len() = %d", tt.spec, l.Len())
 		}
 	}
-	if n := MustParsePorts("1-65000").Len(); n != 65000 {
-		t.Errorf("Len = %d", n)
-	}
-	if s := MustParsePorts("80, 1-3").String(); s != "80,1-3" {
-		t.Errorf("String = %q", s)
+	if l, _ := ParsePorts("1-65000"); l.Len() != 65000 {
+		t.Errorf("Len = %d", l.Len())
 	}
 }
 

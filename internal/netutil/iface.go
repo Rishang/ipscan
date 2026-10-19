@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
+// Package netutil provides IP range, netmask, broadcast and local interface helpers.
 package netutil
 
 import (
@@ -12,7 +13,6 @@ import (
 // IfaceAddr is one address of a local network interface.
 type IfaceAddr struct {
 	Name         string
-	Index        int
 	HardwareAddr net.HardwareAddr
 	Prefix       netip.Prefix // interface address with its prefix length
 	Up           bool
@@ -44,7 +44,6 @@ func Interfaces() ([]IfaceAddr, error) {
 			ones, _ := ipn.Mask.Size()
 			out = append(out, IfaceAddr{
 				Name:         ifc.Name,
-				Index:        ifc.Index,
 				HardwareAddr: ifc.HardwareAddr,
 				Prefix:       netip.PrefixFrom(ip.Unmap().WithZone(""), ones),
 				Up:           ifc.Flags&net.FlagUp != 0,

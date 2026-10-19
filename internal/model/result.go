@@ -6,7 +6,6 @@ import (
 	"cmp"
 	"net/netip"
 	"slices"
-	"strings"
 	"sync"
 	"time"
 )
@@ -31,15 +30,6 @@ func (t ResultType) String() string {
 		return "ports"
 	}
 	return "unknown"
-}
-
-// Matches reports whether other belongs to the category t, as used by
-// display filtering: Alive matches Alive and WithPorts, Dead matches Dead and Unknown.
-func (t ResultType) Matches(other ResultType) bool {
-	if t <= Dead {
-		return other <= Dead
-	}
-	return other >= t
 }
 
 // Result is the outcome of scanning a single host.
@@ -171,18 +161,4 @@ func (s *Stats) Snapshot() Snapshot {
 		Duration: end.Sub(s.start), Scanned: s.scanned, Alive: s.alive,
 		WithPorts: s.withPorts, Finished: s.finished, Aborted: s.aborted,
 	}
-}
-
-// FindText returns the index of the first result at or after start that has a
-// value containing text (case-insensitive), or -1.
-func FindText(rs []*Result, text string, start int) int {
-	text = strings.ToLower(text)
-	for i := max(start, 0); i < len(rs); i++ {
-		for _, v := range rs[i].Values {
-			if strings.Contains(strings.ToLower(v.String()), text) {
-				return i
-			}
-		}
-	}
-	return -1
 }

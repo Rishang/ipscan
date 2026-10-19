@@ -43,8 +43,6 @@ func newICMP(timeout time.Duration) (Pinger, error) {
 	return &icmpPinger{timeout: timeout}, nil
 }
 
-func (p *icmpPinger) Name() string { return ICMP }
-
 func (p *icmpPinger) Ping(ctx context.Context, addr netip.Addr, count int, _ []uint16) (*Result, error) {
 	addr = addr.Unmap()
 	v6 := addr.Is6()
