@@ -20,7 +20,7 @@ Markers: `+` alive with open ports, `*` alive, `-` dead (shown with `--display a
 ## Install
 
 Download an archive from the [releases](../../releases) page and put `ipscan`
-on your `PATH`. Or, with Go 1.25 or later:
+on your `PATH`. Or, with Go 1.26 or later:
 
 ```sh
 go install github.com/noobi/ipscan-go/cmd/ipscan@latest
