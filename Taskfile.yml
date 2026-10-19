@@ -6,7 +6,7 @@ vars:
   VERSION:
     sh: git describe --tags --always --dirty 2>/dev/null || echo dev
   LDFLAGS: -s -w -X main.version={{.VERSION}}
-  STATICCHECK_VERSION: 2025.1.1
+  STATICCHECK_VERSION: 2026.2.2
 
 env:
   CGO_ENABLED: "0"
